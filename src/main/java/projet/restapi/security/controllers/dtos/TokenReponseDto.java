@@ -11,7 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 public class TokenReponseDto {
+    private Long userId;
     private String token;
     private String username;
+    private String nomComplet;
     private List<String> roles=new ArrayList<String>();
 }

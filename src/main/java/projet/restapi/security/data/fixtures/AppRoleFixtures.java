@@ -14,8 +14,11 @@ public class AppRoleFixtures implements CommandLineRunner {
    private final SecurityService securityService;
     @Override
     public void run(String... args) throws Exception {
-          securityService.saveRole("Admin");
-          securityService.saveRole("Client");
+          securityService.saveRole("ROLE_PROFESSEUR");
+          securityService.saveRole("ROLE_ETUDIANT");
+          securityService.saveRole("ROLE_ADMIN");
+          securityService.saveRole("ROLE_RP");
+          securityService.saveRole("ROLE_AC");
 
     }
 }

@@ -10,11 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import projet.core.data.entities.AppRole;
 import projet.core.data.entities.AppUser;
+import projet.core.exceptions.EntityNotFoundException;
 import projet.restapi.security.data.reporitories.AppRoleRepository;
 import projet.restapi.security.data.reporitories.AppUserRepository;
 import projet.restapi.security.services.SecurityService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,11 @@ public class SecurityServiceImpl implements SecurityService, UserDetailsService 
     @Override
     public AppUser getUserByUsername(String username) {
         return appUserRepository.findByLogin(username);
+    }
+
+    @Override
+    public Optional<AppUser> getUserById(Long id) {
+        return appUserRepository.findById(id);
     }
 
     @Override
@@ -45,11 +52,18 @@ public class SecurityServiceImpl implements SecurityService, UserDetailsService 
     }
 
     @Override
+    public AppRole getRoleByName(String roleName) {
+        AppRole role= appRoleRepository.getByRoleName(roleName);
+        if (role == null) throw new EntityNotFoundException("Role not found ");
+        return role;
+    }
+
+    @Override
     public void addRoleToUser(String username, String roleName) {
         AppUser user = appUserRepository.findByLogin(username);
-        if (user == null) throw new RuntimeException("User not found ");
+        if (user == null) throw new EntityNotFoundException("User not found ");
         AppRole role= appRoleRepository.getByRoleName(roleName);
-        if (role == null) throw new RuntimeException("Role not found ");
+        if (role == null) throw new EntityNotFoundException("Role not found ");
         user.getRoles().add(role);
         appUserRepository.save(user);
     }

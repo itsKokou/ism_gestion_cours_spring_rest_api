@@ -10,4 +10,5 @@ import java.util.Map;
 public interface SecurityController {
     @PostMapping("/login")
       public ResponseEntity<Map<Object, Object>> login(@RequestBody AuthenticationRequestDto authenticationRequestDto);
+
 }

@@ -35,7 +35,6 @@ public class JwtFilter extends OncePerRequestFilter {
            if (!jwtService.isTokenExpired(token)){
                 username= jwtService.extractUsername(token);
            }
-
       }
 
 

@@ -1,9 +1,12 @@
 package projet.restapi.web.dtos.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import projet.core.data.dto.NiveauResponseDto;
 import projet.core.data.entities.AnneeScolaire;
 
 @Data
@@ -12,9 +15,10 @@ import projet.core.data.entities.AnneeScolaire;
 @Builder
 public class AnneeScolaireCreateRequestDto {
     private Long id;
+    @NotBlank(message = "Le libelle est obligatoire")
     private String libelle;
-    private boolean isActive;
-    private boolean isArchived;
+    private Boolean isActive;
+    private Boolean isArchived;
 
     public AnneeScolaire toEntity(){
         AnneeScolaire annee = AnneeScolaire.builder()

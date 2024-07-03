@@ -15,6 +15,9 @@ public interface AnneeScolaireRestController {
                           @RequestParam(defaultValue = "0") int page,
                           @RequestParam(defaultValue = "5") int size
                          );
+    @GetMapping("/annees/scolaires/all")//End Point
+    ResponseEntity<Map<Object, Object>>  getAllAnneeScolaire();
+
     @GetMapping("/annees/scolaires/{id}")//End Point
     ResponseEntity<Map<Object, Object>>  showAnneeScolaire(@PathVariable Long id);
 

@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import projet.core.data.entities.AnneeScolaire;
+import projet.core.exceptions.EntityNotFoundException;
 import projet.core.services.AnneeScolaireService;
 import projet.restapi.web.controllers.AnneeScolaireRestController;
 import projet.restapi.web.dtos.RestResponse;
@@ -37,6 +38,14 @@ public class AnneeScolaireRestControllerImpl implements AnneeScolaireRestControl
     }
 
     @Override
+    public ResponseEntity<Map<Object, Object>> getAllAnneeScolaire() {
+        Page<AnneeScolaire> anneeScolaires = anneeScolaireService.getAll(PageRequest.of(0,100));
+        Page<AnneeScolaireResponseDto> dataDtos = anneeScolaires.map(AnneeScolaireResponseDto::toDto);
+        Map<Object, Object> model = RestResponse.response(dataDtos.getContent(), HttpStatus.OK);
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<Map<Object, Object>> showAnneeScolaire(Long id) {
         AnneeScolaire anneeScolaire = anneeScolaireService.show(id).orElse(null);
         Map<Object, Object> response;
@@ -57,7 +66,7 @@ public class AnneeScolaireRestControllerImpl implements AnneeScolaireRestControl
             fieldErrors.forEach(fieldError -> errors.put(fieldError.getField(),fieldError.getDefaultMessage()));
             response= RestResponse.response(errors, HttpStatus.NOT_FOUND);
         }else{
-            if (annee.isActive()){
+            if (annee.getIsActive()){
                 this.changeAnneeActiveInBD();
             }
             AnneeScolaire anneeScolaire = annee.toEntity();
@@ -77,11 +86,17 @@ public class AnneeScolaireRestControllerImpl implements AnneeScolaireRestControl
             fieldErrors.forEach(fieldError -> errors.put(fieldError.getField(),fieldError.getDefaultMessage()));
             response= RestResponse.response(errors, HttpStatus.NOT_FOUND);
         }else{
-            if (annee.isActive()){
-                this.changeAnneeActiveInBD();
+            try {
+                anneeScolaireService.save(annee.toEntity());
+                if (annee.getIsActive()){
+                    this.changeAnneeActiveInBD();
+                }
+                response= RestResponse.response(annee,HttpStatus.CREATED);
+            }catch (Exception e) {
+                response= RestResponse.response(annee,HttpStatus.CONFLICT);
+                System.out.println(e.getMessage());
             }
-            anneeScolaireService.save(annee.toEntity());
-            response= RestResponse.response(annee,HttpStatus.CREATED);
+
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

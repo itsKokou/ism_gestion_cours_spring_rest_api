@@ -8,9 +8,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import projet.core.data.entities.AppUser;
 import projet.restapi.security.controllers.SecurityController;
 import projet.restapi.security.controllers.dtos.AuthenticationRequestDto;
 import projet.restapi.security.controllers.dtos.TokenReponseDto;
@@ -23,7 +23,6 @@ import java.util.Map;
 @RequestMapping("/api")
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(value = "http://localhost:4200")
 @Slf4j
 public class SecurityControllerImpl implements SecurityController {
     private final SecurityService securityService;
@@ -38,9 +37,12 @@ public class SecurityControllerImpl implements SecurityController {
         if(authenticate.isAuthenticated()){
             //Generer le token
              String token= jwtService.createToken(authenticationRequestDto.getUsername());
+             AppUser user = securityService.getUserByUsername(authenticationRequestDto.getUsername());
             TokenReponseDto tokenDto = TokenReponseDto.builder()
                     .token(token)
                     .username(authenticationRequestDto.getUsername())
+                    .userId(user.getId())
+                    .nomComplet(user.getNomComplet())
                     .roles(authenticate.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                     .build();
             response= RestResponse.response(tokenDto, HttpStatus.OK);
@@ -49,4 +51,5 @@ public class SecurityControllerImpl implements SecurityController {
         }
         return ResponseEntity.ok(response);
     }
+
 }
